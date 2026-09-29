@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+// Шрифт заголовка hero — это LCP-элемент, грузим его заранее
+import displayFont from '@fontsource-variable/science-gothic/files/science-gothic-cyrillic-wdth-normal.woff2?url';
 
 interface Props {
   title: string;
@@ -15,7 +17,9 @@ const { title, description } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#17110d" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <title>{title}</title>

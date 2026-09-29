@@ -1,15 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
 ---
 
 <Layout
   title="ДЫМ — smash-бургеры в Батуми"
-  description="Smash-бургеры на открытом огне с доставкой по Батуми. Демо-проект Mr. Web."
+  description="Smash-бургеры на открытом огне с доставкой по Батуми за 40 минут. Демо-проект Mr. Web."
 >
-  <main class="grid min-h-dvh place-items-center bg-neutral-950 px-4 text-center text-orange-50">
-    <div>
-      <h1 class="text-7xl font-black tracking-tight sm:text-9xl">ДЫМ</h1>
-      <p class="mt-4 text-lg text-orange-200/80">Smash-бургеры в Батуми. Скоро здесь будет жарко.</p>
-    </div>
+  <Header />
+  <main>
+    <Hero />
   </main>
 </Layout>
