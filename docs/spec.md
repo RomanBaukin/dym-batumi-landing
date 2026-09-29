@@ -89,7 +89,7 @@ Leaflet + тёмные тайлы OpenStreetMap/CARTO, зоны — полиго
 
 - Astro + Tailwind CSS 4, статическая сборка.
 - Публичный репозиторий на GitHub.
-- Хостинг — Vercel, превью на каждый PR. Домен пока `*.vercel.app`.
+- Хостинг — Vercel, превью на каждый PR. Прод: https://dym-batumi-landing.vercel.app (превью PR закрыты Vercel Deployment Protection — открываются только под аккаунтом Vercel).
 
 ## Критерии готовности
 
