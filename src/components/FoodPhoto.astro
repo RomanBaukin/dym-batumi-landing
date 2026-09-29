@@ -1,0 +1,32 @@
+---
+// Фото позиции меню. Название и состав уже есть рядом текстом, поэтому alt пустой —
+// скринридер не прочитает «Классика дыма» дважды подряд.
+import { Picture } from 'astro:assets';
+import { photo } from '../data/photos';
+
+interface Props {
+  name: string;
+  sizes: string;
+  widths: number[];
+  class?: string;
+}
+
+const { name, sizes, widths, class: className } = Astro.props;
+---
+
+<div class:list={['food-photo', className]}>
+  <Picture src={photo(name)} alt="" widths={widths} sizes={sizes} formats={['avif', 'webp']} />
+</div>
+
+<style>
+  .food-photo {
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: var(--color-iron);
+  }
+  .food-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

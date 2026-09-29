@@ -22,13 +22,25 @@
 /*
   Запасные шрифты с метриками настоящих (ascent/descent из hhea).
   Пока грузится webfont, текст рисуется системным шрифтом на той же базовой
-  линии — подмена не сдвигает строки (CLS = 0).
+  линии и почти той же ширины — подмена не сдвигает строки и не меняет переносы (CLS = 0).
+  size-adjust подобран замером: Science Gothic 800 шире Arial Black в 1.149 раза
+  при font-stretch 100% и в 1.281 — при 125% (бегущая строка), отсюда два начертания.
+  ascent/descent поделены на size-adjust, потому что он масштабирует и их.
 */
 @font-face {
   font-family: "Science Gothic Fallback";
   src: local("Arial Black"), local("Arial Bold"), local("Arial");
-  ascent-override: 108.8%;
-  descent-override: 38.8%;
+  size-adjust: 114.9%;
+  ascent-override: 94.7%;
+  descent-override: 33.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Science Gothic Fallback Wide";
+  src: local("Arial Black"), local("Arial Bold"), local("Arial");
+  size-adjust: 128.1%;
+  ascent-override: 84.9%;
+  descent-override: 30.3%;
   line-gap-override: 0%;
 }
 @font-face {

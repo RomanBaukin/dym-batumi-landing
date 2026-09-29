@@ -1,8 +1,19 @@
 ---
-import { business, deliveryZones } from '../data/menu';
+import { getImage } from 'astro:assets';
+import { business, combo, deliveryZones, menu } from '../data/menu';
+import { photo } from '../data/photos';
+
+// Миниатюры для строк корзины: строки рисует скрипт, поэтому готовим URL заранее, на сборке.
+// У сета своего фото нет — показываем его главную позицию.
+const thumbSources: Array<[string, string]> = [...menu.map((m): [string, string] => [m.id, m.photo]), [combo.id, 'burger-classic']];
+const thumbs = Object.fromEntries(
+  await Promise.all(
+    thumbSources.map(async ([id, name]) => [id, (await getImage({ src: photo(name), width: 112, height: 112, format: 'webp' })).src]),
+  ),
+);
 ---
 
-<dialog class="cart" data-cart aria-labelledby="cart-title">
+<dialog class="cart" data-cart aria-labelledby="cart-title" data-thumbs={JSON.stringify(thumbs)}>
   <div class="flex h-full flex-col">
     <header class="flex items-center gap-3 border-b border-brioche/10 px-5 py-4">
       <button type="button" class="icon-btn" data-back hidden aria-label="Вернуться в корзину">
@@ -304,6 +315,7 @@ import { business, deliveryZones } from '../data/menu';
 
   const dialog = document.querySelector<HTMLDialogElement>('[data-cart]')!;
   const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = dialog) => root.querySelector<T>(sel)!;
+  const thumbs: Record<string, string> = JSON.parse(dialog.dataset.thumbs ?? '{}');
   const form = $<HTMLFormElement>('[data-view="checkout"]');
   const views = ['cart', 'checkout', 'done'] as const;
   type View = (typeof views)[number];
@@ -405,7 +417,8 @@ import { business, deliveryZones } from '../data/menu';
     $('[data-lines]').innerHTML = lines
       .map(
         (l) => `
-        <li class="flex items-center gap-4 border-b border-brioche/10 py-4">
+        <li class="flex items-center gap-3 border-b border-brioche/10 py-4 sm:gap-4">
+          ${thumbs[l.id] ? `<img src="${thumbs[l.id]}" alt="" width="56" height="56" class="size-14 shrink-0 rounded-xl bg-iron object-cover" />` : ''}
           <div class="min-w-0 flex-1">
             <p class="font-semibold">${esc(l.name)}</p>
             <p class="text-sm text-smoke">${formatPrice(l.price)}</p>

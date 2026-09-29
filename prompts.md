@@ -196,24 +196,24 @@ A woman in her early 40s with short blonde hair and glasses, wearing a light lin
 
 ## Чек-лист
 
-- [ ] `hero-burger.png`
-- [ ] `layer-bun-top.png`
-- [ ] `layer-onion.png`
-- [ ] `layer-patty-cheese.png`
-- [ ] `layer-sauce.png`
-- [ ] `layer-bun-bottom.png`
-- [ ] `burger-classic.png`
-- [ ] `burger-fat.png`
-- [ ] `burger-adjarian.png`
-- [ ] `burger-suluguni.png`
-- [ ] `burger-tkemali.png`
-- [ ] `burger-mushroom.png`
-- [ ] `side-fries.png`
-- [ ] `side-loaded-fries.png`
-- [ ] `side-onion-rings.png`
-- [ ] `drink-tarragon.png`
-- [ ] `drink-milkshake.png`
-- [ ] `drink-peach-tea.png`
-- [ ] `avatar-1.png` … `avatar-4.png`
+- [x] `hero-burger.png`
+- [x] `layer-bun-top.png`
+- [x] `layer-onion.png`
+- [x] `layer-patty-cheese.png`
+- [x] `layer-sauce.png`
+- [x] `layer-bun-bottom.png`
+- [x] `burger-classic.png`
+- [x] `burger-fat.png`
+- [x] `burger-adjarian.png`
+- [x] `burger-suluguni.png`
+- [x] `burger-tkemali.png`
+- [x] `burger-mushroom.png`
+- [x] `side-fries.png`
+- [x] `side-loaded-fries.png`
+- [x] `side-onion-rings.png`
+- [x] `drink-tarragon.png`
+- [x] `drink-milkshake.png`
+- [x] `drink-peach-tea.png`
+- [x] `avatar-1.png` … `avatar-4.png`
 
 Итого 22 картинки.
