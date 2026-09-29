@@ -1,0 +1,152 @@
+---
+import BurgerLayer, { type Layer } from './BurgerLayer.astro';
+
+// Взрыв-схема «Классики дыма»: каждая фишка бургерной привязана к слою, где она живёт.
+// Этап 3 — статичное «разобранное» состояние. Анимация сборки/разборки по скроллу — этап 5.
+const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
+  {
+    layers: ['bun-top'],
+    title: 'Бриошь',
+    text: 'Печёт пекарня на Руставели, привозят к 7 утра. Срез поджариваем на сливочном масле.',
+  },
+  {
+    layers: ['onion'],
+    title: 'Лук и огурцы',
+    text: 'Маринуем сами: сутки в яблочном уксусе с укропом.',
+  },
+  {
+    layers: ['patty-cheese', 'patty-cheese'],
+    title: 'Две котлеты с чеддером',
+    text: 'Фарш из лопатки и грудинки крутим каждое утро. Шар 90 г давим на чугуне при 250°, пока края не станут кружевными.',
+  },
+  {
+    layers: ['sauce'],
+    title: 'Соус «Дым»',
+    text: 'Копчёная паприка, маринованные огурцы и один ингредиент, который мы не расскажем.',
+  },
+  {
+    layers: ['bun-bottom'],
+    title: 'Нижняя булка',
+    text: 'Тоже поджариваем, чтобы сок не размочил дно до последнего укуса.',
+  },
+];
+---
+
+<section id="inside" class="section" aria-labelledby="inside-title">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <h2 id="inside-title" class="section-title max-w-[16ch]">Разбираем «Классику дыма» по слоям</h2>
+
+    <ol class="exploded mt-12 lg:mt-20">
+      {rows.map((row, i) => (
+        <li class:list={['row', i % 2 === 0 ? 'row-left' : 'row-right']}>
+          <div class="layers">
+            {row.layers.map((layer) => (
+              <BurgerLayer layer={layer} class="layer" />
+            ))}
+          </div>
+          <div class="label">
+            <h3 class="display text-xl text-cheddar">{row.title}</h3>
+            <p class="mt-2 text-smoke">{row.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="mt-12 flex justify-center lg:mt-16">
+      <a href="#menu" class="btn btn-primary">Заказать «Классику дыма» за 18 ₾</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .exploded {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .row {
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .layers {
+    display: grid;
+    gap: 0.5rem;
+    width: min(100%, 22rem);
+  }
+
+  .layer {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.45));
+  }
+
+  .label {
+    max-width: 34ch;
+  }
+
+  .label h3 {
+    font-stretch: 125%;
+  }
+
+  /*
+    Десктоп: слои по центру, подписи чередуются слева и справа.
+    Линия-выноска ведёт от подписи к своему слою.
+  */
+  @media (min-width: 64rem) {
+    .exploded {
+      gap: 3rem;
+    }
+
+    .row {
+      grid-template-columns: 1fr minmax(0, 26rem) 1fr;
+      align-items: center;
+      gap: 0;
+      justify-items: stretch;
+      text-align: left;
+    }
+
+    .layers {
+      grid-column: 2;
+      grid-row: 1;
+      width: 100%;
+    }
+
+    .label {
+      grid-row: 1;
+      position: relative;
+      max-width: none;
+    }
+
+    .label::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      height: 1px;
+      width: 3.5rem;
+      background: color-mix(in oklab, var(--color-brioche) 30%, transparent);
+    }
+
+    .row-left .label {
+      grid-column: 1;
+      padding-right: 5rem;
+      text-align: right;
+      justify-self: end;
+      max-width: 26rem;
+    }
+    .row-left .label::before {
+      right: 1rem;
+    }
+
+    .row-right .label {
+      grid-column: 3;
+      padding-left: 5rem;
+      max-width: 26rem;
+    }
+    .row-right .label::before {
+      left: 1rem;
+    }
+  }
+</style>

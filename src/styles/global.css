@@ -67,6 +67,26 @@
     letter-spacing: -0.01em;
   }
 
+  .section {
+    padding-block: 5rem;
+    scroll-margin-top: 4rem;
+  }
+  @media (min-width: 64rem) {
+    .section {
+      padding-block: 6.5rem;
+    }
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 6vw, 4.5rem);
+    font-stretch: 130%;
+    font-weight: 850;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
   .btn {
     @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 font-semibold transition-colors;
   }

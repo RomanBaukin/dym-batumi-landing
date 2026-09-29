@@ -1,0 +1,53 @@
+---
+// Временная заглушка вместо фото позиции меню — на этапе 5 заменим на <Image> из src/assets
+import type { Category } from '../data/menu';
+
+interface Props {
+  category: Category;
+  class?: string;
+}
+
+const { category, class: className } = Astro.props;
+---
+
+<div class:list={['placeholder', className]} aria-hidden="true">
+  <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    {category === 'burgers' && (
+      <g>
+        <path d="M22 54c0-20 17-32 38-32s38 12 38 32Z" />
+        <path d="M18 64c8-4 14 4 21 0s14 4 21 0 14 4 21 0 14 4 21 0" />
+        <rect x="20" y="70" width="80" height="12" rx="6" />
+        <path d="M24 88h72c0 8-6 12-14 12H38c-8 0-14-4-14-12Z" />
+      </g>
+    )}
+    {category === 'sides' && (
+      <g>
+        <path d="M34 50 28 30m14 20-2-26m12 26 2-28m10 28 4-24m8 24 8-20" />
+        <path d="M26 50h68l-8 50H34Z" />
+      </g>
+    )}
+    {category === 'drinks' && (
+      <g>
+        <path d="M36 32h48l-6 68H42Z" />
+        <path d="M68 32 76 12h10" />
+        <path d="M40 56h40" />
+      </g>
+    )}
+  </svg>
+</div>
+
+<style>
+  .placeholder svg {
+    width: 40%;
+    height: auto;
+  }
+  .placeholder {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    color: color-mix(in oklab, var(--color-smoke) 45%, transparent);
+    background:
+      radial-gradient(circle at 50% 65%, color-mix(in oklab, var(--color-ember) 22%, transparent), transparent 60%),
+      var(--color-iron);
+  }
+</style>

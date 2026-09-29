@@ -1,0 +1,73 @@
+---
+// Временные SVG-слои для взрыв-схемы — на этапе 5 заменим на layer-*.png из prompts.md
+export type Layer = 'bun-top' | 'onion' | 'patty-cheese' | 'sauce' | 'bun-bottom';
+
+interface Props {
+  layer: Layer;
+  class?: string;
+}
+
+const { layer, class: className } = Astro.props;
+const id = `bl-${layer}-${Math.random().toString(36).slice(2, 7)}`;
+
+const viewBoxes: Record<Layer, string> = {
+  'bun-top': '90 44 420 172',
+  onion: '96 186 428 36',
+  'patty-cheese': '74 206 452 84',
+  sauce: '0 0 440 44',
+  'bun-bottom': '104 344 392 72',
+};
+---
+
+<svg class={className} viewBox={viewBoxes[layer]} aria-hidden="true">
+  <defs>
+    <linearGradient id={`${id}-bun`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0b060" />
+      <stop offset=".7" stop-color="#c06a22" />
+      <stop offset="1" stop-color="#8a4414" />
+    </linearGradient>
+    <linearGradient id={`${id}-patty`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6b3a22" />
+      <stop offset="1" stop-color="#2e170d" />
+    </linearGradient>
+  </defs>
+
+  {layer === 'bun-top' && (
+    <g>
+      <path d="M96 200c0-96 92-150 204-150s204 54 204 150c0 8-6 12-14 12H110c-8 0-14-4-14-12Z" fill={`url(#${id}-bun)`} />
+      <path d="M150 110c40-40 110-50 170-44" fill="none" stroke="#ffd9a0" stroke-width="10" stroke-linecap="round" opacity=".35" />
+      <g fill="#f8e8c8">
+        <ellipse cx="220" cy="100" rx="7" ry="4" transform="rotate(-20 220 100)" />
+        <ellipse cx="290" cy="82" rx="7" ry="4" transform="rotate(10 290 82)" />
+        <ellipse cx="360" cy="96" rx="7" ry="4" transform="rotate(25 360 96)" />
+        <ellipse cx="250" cy="140" rx="7" ry="4" transform="rotate(5 250 140)" />
+        <ellipse cx="330" cy="130" rx="7" ry="4" transform="rotate(-15 330 130)" />
+        <ellipse cx="410" cy="140" rx="7" ry="4" transform="rotate(30 410 140)" />
+        <ellipse cx="180" cy="150" rx="7" ry="4" transform="rotate(-30 180 150)" />
+      </g>
+    </g>
+  )}
+
+  {layer === 'onion' && (
+    <g fill="none" stroke-linecap="round">
+      <path d="M110 204c30-12 60 8 90-2s60 10 90 0 60 10 90 0 60 10 110 2" stroke="#c2507e" stroke-width="10" />
+      <path d="M150 210c20-6 40 4 60 0m90 2c20-6 40 4 60 0" stroke="#7fa650" stroke-width="8" />
+    </g>
+  )}
+
+  {layer === 'patty-cheese' && (
+    <g>
+      <path d="M80 236c0-14 12-22 26-22h388c14 0 26 8 26 22v22c0 16-12 28-28 28H108c-16 0-28-12-28-28Z" fill={`url(#${id}-patty)`} />
+      <path d="M80 240c20-8 34 6 52-2s30 8 48 0 32 6 52-2 30 8 50 0 32 6 50-2 30 8 50 0 32 6 48-2 28 6 50 2" fill="none" stroke="#a0582c" stroke-width="5" stroke-linecap="round" />
+      <path d="M92 212h416l-14 20-8 40-16-38-48 10-20 36-18-34-64 4-14 26-14-26-84-2-16 38-12-40-52 8Z" fill="#f5b32b" />
+    </g>
+  )}
+
+  {layer === 'sauce' && (
+    <path d="M16 14c40-10 70 8 110 2s70 8 110 0 80 8 110 0 60 6 80 2c4 8-6 14-20 16l-10 10-8-8c-40 4-70-2-110 2l-8 12-10-12c-40 2-80 0-120 2l-10 10-8-12C20 30 8 24 16 14Z" fill="#e8762a" />
+  )}
+
+  {layer === 'bun-bottom' && (
+    <path d="M110 350h380c0 40-30 62-80 62H190c-50 0-80-22-80-62Z" fill={`url(#${id}-bun)`} />
+  )}
+</svg>

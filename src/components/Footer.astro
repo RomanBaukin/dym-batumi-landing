@@ -1,0 +1,58 @@
+---
+import { business } from '../data/menu';
+
+// TODO: ссылка на Instagram Mr. Web — Рома пришлёт
+const studioUrl = '#';
+
+const links = [
+  { href: '#menu', label: 'Меню' },
+  { href: '#deals', label: 'Сет и акция' },
+  { href: '#delivery', label: 'Доставка' },
+  { href: '#reviews', label: 'Отзывы' },
+  { href: '#faq', label: 'Вопросы' },
+];
+---
+
+<footer class="border-t border-brioche/10">
+  <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
+    <div>
+      <p class="logo display text-3xl">ДЫМ</p>
+      <p class="mt-3 text-smoke">Smash-бургеры на открытом огне</p>
+    </div>
+
+    <div>
+      <h2 class="font-semibold">Где нас найти</h2>
+      <address class="mt-3 not-italic text-smoke">
+        {business.address}<br />
+        {business.hours}
+      </address>
+    </div>
+
+    <nav aria-label="Разделы в подвале">
+      <h2 class="font-semibold">На странице</h2>
+      <ul class="mt-3 grid gap-2">
+        {links.map((l) => (
+          <li><a href={l.href} class="text-smoke transition-colors hover:text-brioche">{l.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Плашка демо-проекта -->
+  <div class="bg-iron">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-5 text-sm sm:px-6">
+      <p class="text-smoke">Демо-проект. Бургерной ДЫМ не существует — а жаль.</p>
+      <p>
+        Дизайн и разработка —{' '}
+        <a href={studioUrl} class="font-semibold text-cheddar underline decoration-cheddar/40 underline-offset-4 hover:decoration-cheddar" target="_blank" rel="noopener">Mr.&nbsp;Web</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .logo {
+    font-stretch: 200%;
+    font-weight: 900;
+  }
+</style>

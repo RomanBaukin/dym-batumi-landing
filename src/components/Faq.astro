@@ -1,0 +1,61 @@
+---
+import { business } from '../data/menu';
+
+const faq = [
+  {
+    q: 'Можно котлету средней прожарки?',
+    a: 'Нет, и это не каприз. Тонкую smash-котлету прижимаем к чугуну на 250°, она готовится за две минуты и розовой не бывает. Зато корочка хрустит, а внутри остаётся сочно.',
+  },
+  {
+    q: 'Бургер не остынет по дороге?',
+    a: 'Возим в термосумках, а коробки у нас с отверстиями для пара, поэтому булка не размокает. В самую дальнюю зону едем не больше часа.',
+  },
+  {
+    q: 'Можно убрать лук или добавить халапеньо?',
+    a: 'Да. Напишите пожелания в комментарии к заказу, повар прочитает.',
+  },
+  {
+    q: 'Как оплатить?',
+    a: 'Наличными или картой курьеру. При самовывозе — на кассе.',
+  },
+  {
+    q: 'До скольки принимаете заказы?',
+    a: `Работаем каждый день до 2 ночи, последний заказ — в ${business.lastOrder}.`,
+  },
+];
+---
+
+<section id="faq" class="section" aria-labelledby="faq-title">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6">
+    <h2 id="faq-title" class="section-title">Частые вопросы</h2>
+
+    <div class="mt-10 lg:ml-auto lg:mt-14 lg:w-2/3">
+      {faq.map((item) => (
+        <details class="item border-b border-brioche/15">
+          <summary class="flex min-h-16 cursor-pointer items-center justify-between gap-6 py-5 text-lg font-semibold">
+            {item.q}
+            <svg class="icon shrink-0 text-cheddar" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M10 3v14M3 10h14" />
+            </svg>
+          </summary>
+          <p class="max-w-[62ch] pb-6 text-smoke">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  .icon {
+    transition: transform 0.25s;
+  }
+  details[open] .icon {
+    transform: rotate(45deg);
+  }
+</style>
