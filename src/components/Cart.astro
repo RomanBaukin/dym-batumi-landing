@@ -299,6 +299,7 @@ import { business, deliveryZones } from '../data/menu';
 
 <script>
   import * as cart from '../scripts/cart-store';
+  import { flySource, flyToCart } from '../scripts/fly-to-cart';
   import { business, deliveryZones } from '../data/menu';
 
   const dialog = document.querySelector<HTMLDialogElement>('[data-cart]')!;
@@ -350,10 +351,12 @@ import { business, deliveryZones } from '../data/menu';
   const toast = document.querySelector<HTMLElement>('[data-toast]')!;
   let toastTimer: number | undefined;
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', async (e) => {
     const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-add-to-cart]');
     if (!btn) return;
     const id = btn.dataset.addToCart!;
+    // товар попадает в корзину в момент «приземления» — тогда же подпрыгивает счётчик
+    if (!dialog.open) await flyToCart(flySource(btn));
     cart.add(id);
     if (dialog.open) return;
     const name = cart.catalog.get(id)?.name ?? '';

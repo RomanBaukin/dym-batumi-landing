@@ -32,11 +32,12 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
 ];
 ---
 
-<section id="inside" class="section" aria-labelledby="inside-title">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6">
-    <h2 id="inside-title" class="section-title max-w-[16ch]">Разбираем «Классику дыма» по слоям</h2>
+<section id="inside" class="section inside" aria-labelledby="inside-title" data-inside>
+  <div class="runway" data-runway>
+    <div class="scene mx-auto max-w-7xl px-4 sm:px-6">
+      <h2 id="inside-title" class="inside-title section-title max-w-[16ch]">Разбираем «Классику дыма» по слоям</h2>
 
-    <ol class="exploded mt-12 lg:mt-20">
+      <ol class="exploded mt-12 lg:mt-20" data-stage>
       {rows.map((row, i) => (
         <li class:list={['row', i % 2 === 0 ? 'row-left' : 'row-right']}>
           <div class="layers">
@@ -50,11 +51,12 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
           </div>
         </li>
       ))}
-    </ol>
-
-    <div class="mt-12 flex justify-center lg:mt-16">
-      <button type="button" class="btn btn-primary" data-add-to-cart="classic">Добавить «Классику дыма» за 18 ₾</button>
+      </ol>
     </div>
+  </div>
+
+  <div class="mx-auto mt-12 flex max-w-7xl justify-center px-4 sm:px-6 lg:mt-16">
+    <button type="button" class="btn btn-primary" data-add-to-cart="classic" data-fly-from="[data-stage] .layers">Добавить «Классику дыма» за 18 ₾</button>
   </div>
 </section>
 
@@ -149,4 +151,214 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
       left: 1rem;
     }
   }
+  /*
+    Анимированный режим (включает скрипт ниже, если нет prefers-reduced-motion).
+    Секция превращается во «взлётную полосу»: сцена закреплена на экране, а прогресс
+    прокрутки полосы управляет разлётом слоёв. Позиции считает JS, CSS только раскладывает.
+  */
+  .is-anim .runway {
+    height: 400vh;
+  }
+  .is-anim .scene {
+    position: sticky;
+    top: 4rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 4rem);
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  .is-anim .inside-title {
+    font-size: clamp(1.75rem, 5vw, 3.25rem);
+  }
+  .is-anim .exploded {
+    position: relative;
+    display: block;
+    flex: 1;
+    margin-top: 1rem;
+  }
+  .is-anim .row {
+    position: absolute;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+  }
+  .is-anim .layers {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--w);
+    margin-left: calc(var(--w) / -2);
+    gap: 0.125rem;
+    will-change: transform;
+    transition: opacity 0.3s;
+  }
+  .is-anim .label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    margin-inline: auto;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .is-anim .layers.is-dim {
+    opacity: 0.25;
+  }
+  .is-anim .label.is-on {
+    opacity: 1;
+  }
+
+  @media (min-width: 64rem) {
+    .is-anim .runway {
+      height: 260vh;
+    }
+    .is-anim .exploded {
+      margin-top: 2rem;
+    }
+    .is-anim .label {
+      top: 0;
+      bottom: auto;
+      width: min(22rem, calc(50% - var(--w) / 2 - 5rem));
+      margin: 0;
+      transition: none;
+      will-change: transform, opacity;
+    }
+    .is-anim .row-left .label {
+      left: auto;
+      right: calc(50% + var(--w) / 2 + 4.5rem);
+    }
+    .is-anim .row-right .label {
+      left: calc(50% + var(--w) / 2 + 4.5rem);
+      right: auto;
+    }
+    .is-anim .row-left .label::before {
+      right: -3.5rem;
+      width: 2.5rem;
+    }
+    .is-anim .row-right .label::before {
+      left: -3.5rem;
+      width: 2.5rem;
+    }
+  }
 </style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('[data-inside]');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section && !reduce.matches) {
+    const runway = section.querySelector<HTMLElement>('[data-runway]')!;
+    const stage = section.querySelector<HTMLElement>('[data-stage]')!;
+    const rows = [...stage.querySelectorAll<HTMLElement>('.row')].map((row) => ({
+      layers: row.querySelector<HTMLElement>('.layers')!,
+      label: row.querySelector<HTMLElement>('.label')!,
+      h: 0,
+      assembled: 0,
+      exploded: 0,
+    }));
+    const desktop = matchMedia('(min-width: 64rem)');
+    const HEADER = 64;
+
+    section.classList.add('is-anim');
+
+    const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+    function layout() {
+      const isDesktop = desktop.matches;
+      const sw = stage.clientWidth;
+      const sh = stage.clientHeight;
+
+      // На мобилке под бургером — место для подписи активного слоя
+      const captionH = isDesktop ? 0 : Math.max(...rows.map((r) => r.label.offsetHeight)) + 16;
+      const avail = sh - captionH;
+
+      // Ширина бургера: сколько позволяет экран и по ширине, и по высоте
+      stage.style.setProperty('--w', '100px');
+      const ratio = rows.reduce((sum, r) => sum + r.layers.offsetHeight, 0) / 100;
+      const wMax = isDesktop ? Math.min(416, sw * 0.34) : Math.min(sw * 0.72, 272);
+      const w = Math.min(wMax, (avail * 0.72) / ratio);
+      stage.style.setProperty('--w', `${w}px`);
+
+      rows.forEach((r) => (r.h = r.layers.offsetHeight));
+      const total = rows.reduce((sum, r) => sum + r.h, 0);
+      const gap = clamp((avail - total) / (rows.length - 1), 8, isDesktop ? 48 : 36);
+      const spread = total + gap * (rows.length - 1);
+
+      let a = (avail - total * 0.88) / 2;
+      let x = Math.max(0, (avail - spread) / 2);
+      rows.forEach((r) => {
+        r.assembled = a;
+        r.exploded = x;
+        a += r.h * 0.88; // в собранном виде слои заходят друг на друга
+        x += r.h + gap;
+      });
+      update();
+    }
+
+    function update() {
+      // p: 0 — сцена только прилипла к верху, 1 — полоса прокручена до конца
+      const rect = runway.getBoundingClientRect();
+      const distance = rect.height - (innerHeight - HEADER);
+      const p = clamp((HEADER - rect.top) / distance);
+      const e = ease(clamp((p - 0.08) / 0.42));
+      const isDesktop = desktop.matches;
+
+      // Мобилка: после разлёта слои по очереди подсвечиваются, подпись — под бургером
+      const step = e < 1 ? -1 : Math.min(rows.length - 1, Math.floor(clamp((p - 0.52) / 0.44) * rows.length));
+
+      rows.forEach((r, i) => {
+        const y = lerp(r.assembled, r.exploded, e);
+        r.layers.style.transform = `translateY(${y}px)`;
+
+        if (isDesktop) {
+          const o = clamp((e - 0.55 - i * 0.07) / 0.2);
+          const side = i % 2 === 0 ? 1 : -1;
+          const top = y + r.h / 2 - r.label.offsetHeight / 2;
+          r.label.style.opacity = String(o);
+          r.label.style.transform = `translate(${(1 - o) * 24 * side}px, ${top}px)`;
+          r.layers.classList.remove('is-dim');
+          r.label.classList.remove('is-on');
+        } else {
+          r.label.style.opacity = '';
+          r.label.style.transform = '';
+          r.layers.classList.toggle('is-dim', step !== -1 && step !== i);
+          r.label.classList.toggle('is-on', step === i);
+        }
+      });
+    }
+
+    let ticking = false;
+    addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          update();
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+    new ResizeObserver(layout).observe(stage);
+    desktop.addEventListener('change', layout);
+    document.fonts.ready.then(layout);
+
+    // «Уменьшить движение» включили на лету — возвращаем статичную схему
+    reduce.addEventListener('change', () => {
+      if (!reduce.matches) return;
+      section.classList.remove('is-anim');
+      rows.forEach((r) => {
+        r.layers.removeAttribute('style');
+        r.label.removeAttribute('style');
+        r.layers.classList.remove('is-dim');
+        r.label.classList.remove('is-on');
+      });
+    });
+  }
+</script>
