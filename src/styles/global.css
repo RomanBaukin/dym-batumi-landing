@@ -1,6 +1,43 @@
 @import "tailwindcss";
-@import "@fontsource-variable/science-gothic/wdth.css";
-@import "@fontsource-variable/golos-text";
+
+/*
+  Шрифты урезаны до того, что реально есть на странице (scripts/subset-fonts.py):
+  латиница ASCII, кириллица, ₾ и типографские знаки. Science Gothic — только
+  оси wdth 50–200 и wght 700–900. Лицензии OFL лежат рядом с файлами.
+*/
+@font-face {
+  font-family: "Science Gothic DYM";
+  src: url("../assets/fonts/science-gothic-dym.woff2") format("woff2");
+  font-weight: 700 900;
+  font-stretch: 50% 200%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Golos Text DYM";
+  src: url("../assets/fonts/golos-text-dym.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+/*
+  Запасные шрифты с метриками настоящих (ascent/descent из hhea).
+  Пока грузится webfont, текст рисуется системным шрифтом на той же базовой
+  линии — подмена не сдвигает строки (CLS = 0).
+*/
+@font-face {
+  font-family: "Science Gothic Fallback";
+  src: local("Arial Black"), local("Arial Bold"), local("Arial");
+  ascent-override: 108.8%;
+  descent-override: 38.8%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Golos Text Fallback";
+  src: local("Arial"), local("Helvetica"), local("Roboto");
+  ascent-override: 98%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
 
 /*
   Дизайн-токены ДЫМа. Палитра собрана из самой бургерной:
@@ -16,8 +53,8 @@
   --color-brioche: #f4ddb0;   /* основной текст — поджаренная бриошь */
   --color-smoke: #a39486;     /* вторичный текст — дым */
 
-  --font-display: "Science Gothic Variable", "Arial Black", sans-serif;
-  --font-sans: "Golos Text Variable", system-ui, sans-serif;
+  --font-display: "Science Gothic DYM", "Science Gothic Fallback", sans-serif;
+  --font-sans: "Golos Text DYM", "Golos Text Fallback", system-ui, sans-serif;
 
   --ease-press: cubic-bezier(0.7, 0, 0.84, 0);
 }

@@ -22,14 +22,15 @@ const links = [
     <button
       type="button"
       class="ml-auto flex min-h-11 items-center gap-2 rounded-full bg-iron px-4 font-semibold md:ml-0"
-      aria-label="Корзина, 0 товаров"
       data-cart-button
     >
       <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 7h12l-1 13H7L6 7Z" /><path d="M9 7a3 3 0 0 1 6 0" />
       </svg>
-      <span class="hidden sm:inline">Корзина</span>
+      <!-- Доступное имя собирается из содержимого: «Корзина 0 товаров» — совпадает с тем, что видно -->
+      <span class="sr-only sm:not-sr-only">Корзина</span>
       <span class="grid h-6 min-w-6 place-items-center rounded-full bg-cheddar px-1.5 text-sm text-soot" data-cart-count>0</span>
+      <span class="sr-only" data-cart-noun>товаров</span>
     </button>
   </div>
 </header>
