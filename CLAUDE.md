@@ -6,6 +6,7 @@
 
 - Astro 7 (статическая сборка) + Tailwind CSS 4 через `@tailwindcss/vite`. Tailwind подключён в `src/styles/global.css`, дизайн-токены — там же через `@theme`.
 - Общий `<head>` — `src/layouts/Layout.astro`.
+- Данные (меню, сет, зоны, контакты) — `src/data/menu.ts`. Логика корзины без DOM — `src/scripts/cart-store.ts`, UI корзины и оформления — `src/components/Cart.astro`, карта — `src/scripts/delivery-map.ts` (ленивая загрузка из `Delivery.astro`).
 - Хостинг — Vercel, репозиторий — `RomanBaukin/dym-batumi-landing` (публичный).
 
 ## Команды
@@ -13,6 +14,7 @@
 - `npm run dev` — дев-сервер на http://localhost:4321
 - `npm run build` — сборка в `dist/`
 - `npm run preview` — просмотр сборки
+- `npm run check` — проверка типов (astro check)
 
 ## Правила проекта
 

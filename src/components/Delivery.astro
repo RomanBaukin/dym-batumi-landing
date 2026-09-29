@@ -38,9 +38,8 @@ import { business, deliveryZones } from '../data/menu';
         </dl>
       </div>
 
-      <!-- Живая карта Leaflet с зонами — этап 4 -->
-      <div class="map-placeholder lg:col-span-7" data-delivery-map>
-        <p class="text-smoke">Здесь будет карта зон доставки</p>
+      <div class="map lg:col-span-7" data-delivery-map role="region" aria-label="Карта зон доставки">
+        <p class="map-loading text-smoke">Загружаем карту…</p>
       </div>
     </div>
   </div>
@@ -64,12 +63,84 @@ import { business, deliveryZones } from '../data/menu';
     background: var(--color-brioche);
   }
 
-  .map-placeholder {
+  .map {
+    position: relative;
     display: grid;
     place-items: center;
-    min-height: 22rem;
+    min-height: 24rem;
     border-radius: 2rem;
+    overflow: hidden;
     background: var(--color-iron);
-    border: 2px dashed color-mix(in oklab, var(--color-brioche) 15%, transparent);
+    /* поверх тайлов Leaflet — чтобы скругление не терялось */
+    isolation: isolate;
+  }
+  @media (min-width: 64rem) {
+    .map {
+      min-height: 32rem;
+    }
+  }
+
+  /* Leaflet в фирменных цветах */
+  .map :global(.leaflet-container) {
+    background: var(--color-iron);
+    font: inherit;
+  }
+  /* Светлые тайлы OSM → тёплая «ночная» карта в палитре сайта */
+  .map :global(.leaflet-tile-pane) {
+    filter: invert(1) hue-rotate(180deg) sepia(0.35) saturate(0.6) brightness(0.8) contrast(0.95);
+  }
+  .map :global(.leaflet-control-attribution) {
+    background: rgb(23 17 13 / 0.8);
+    color: var(--color-smoke);
+  }
+  .map :global(.leaflet-control-attribution a) {
+    color: var(--color-brioche);
+  }
+  .map :global(.leaflet-bar a) {
+    background: var(--color-soot);
+    color: var(--color-brioche);
+    border-color: color-mix(in oklab, var(--color-brioche) 15%, transparent);
+  }
+  .map :global(.leaflet-popup-content-wrapper),
+  .map :global(.leaflet-popup-tip) {
+    background: var(--color-soot);
+    color: var(--color-brioche);
+  }
+  .map :global(.leaflet-popup-close-button) {
+    color: var(--color-smoke);
+  }
+  .map :global(.map-pin span) {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-ember);
+    color: var(--color-soot);
+    font-family: var(--font-display);
+    font-stretch: 150%;
+    font-weight: 900;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.5);
   }
 </style>
+
+<script>
+  // Leaflet (~40 КБ) и тайлы грузим, только когда блок доставки почти на экране
+  const el = document.querySelector<HTMLElement>('[data-delivery-map]');
+  if (el) {
+    const io = new IntersectionObserver(
+      async ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        try {
+          const { mountMap } = await import('../scripts/delivery-map');
+          el.replaceChildren();
+          mountMap(el);
+        } catch {
+          el.innerHTML = '<p class="px-6 text-center text-smoke">Карта не загрузилась. Все зоны и условия — в списке.</p>';
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    io.observe(el);
+  }
+</script>
