@@ -1,3 +1,92 @@
 @import "tailwindcss";
+@import "@fontsource-variable/science-gothic/wdth.css";
+@import "@fontsource-variable/golos-text";
 
-/* Дизайн-токены (палитра, шрифты) появятся на этапе 2 */
+/*
+  Дизайн-токены ДЫМа. Палитра собрана из самой бургерной:
+  сажа и чугун плиты, жар углей, чеддер, бриошь, дым.
+  Стандартная палитра Tailwind отключена — только брендовые цвета.
+*/
+@theme {
+  --color-*: initial;
+  --color-soot: #17110d;      /* фон — сажа, тёплый коричнево-чёрный */
+  --color-iron: #2a1f19;      /* поверхности — чугунная плита */
+  --color-ember: #ff5b1f;     /* главный акцент, CTA — жар */
+  --color-cheddar: #f5b32b;   /* второй акцент, цены, бейджи — чеддер */
+  --color-brioche: #f4ddb0;   /* основной текст — поджаренная бриошь */
+  --color-smoke: #a39486;     /* вторичный текст — дым */
+
+  --font-display: "Science Gothic Variable", "Arial Black", sans-serif;
+  --font-sans: "Golos Text Variable", system-ui, sans-serif;
+
+  --ease-press: cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-soot font-sans text-brioche antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  /* Зерно поверх всего — чтобы тёмный фон выглядел как закопчённый чугун, а не как пустой экран */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-cheddar);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-soot);
+  }
+}
+
+@layer components {
+  /* Заголовки: Science Gothic, ширина — главный выразительный инструмент бренда */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 850;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+  }
+
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 font-semibold transition-colors;
+  }
+  .btn-primary {
+    @apply bg-ember text-soot hover:bg-cheddar;
+  }
+  .btn-ghost {
+    @apply border-2 border-brioche/25 text-brioche hover:border-brioche;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
