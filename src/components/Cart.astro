@@ -391,9 +391,7 @@ import { business, deliveryZones } from '../data/menu';
         el.classList.add('bump');
       }
     });
-    document.querySelectorAll('[data-cart-button]').forEach((b) =>
-      b.setAttribute('aria-label', `Корзина, ${n} ${cart.plural(n, 'товар', 'товара', 'товаров')}`),
-    );
+    document.querySelectorAll('[data-cart-noun]').forEach((el) => (el.textContent = cart.plural(n, 'товар', 'товара', 'товаров')));
   }
 
   function renderCart() {
