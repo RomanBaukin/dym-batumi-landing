@@ -3,31 +3,37 @@ import BurgerLayer, { type Layer } from './BurgerLayer.astro';
 
 // Взрыв-схема «Классики дыма»: каждая фишка бургерной привязана к слою, где она живёт.
 // Этап 3 — статичное «разобранное» состояние. Анимация сборки/разборки по скроллу — этап 5.
-const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
+// stack — какая доля высоты слоя остаётся видна в собранном бургере (остальное уходит под следующий слой)
+const rows: Array<{ layers: Layer[]; title: string; text: string; stack: number }> = [
   {
     layers: ['bun-top'],
     title: 'Бриошь',
     text: 'Печёт пекарня на Руставели, привозят к 7 утра. Срез поджариваем на сливочном масле.',
+    stack: 0.8,
   },
   {
     layers: ['onion'],
     title: 'Лук и огурцы',
     text: 'Маринуем сами: сутки в яблочном уксусе с укропом.',
+    stack: 0.45,
   },
   {
     layers: ['patty-cheese', 'patty-cheese'],
     title: 'Две котлеты с чеддером',
     text: 'Фарш из лопатки и грудинки крутим каждое утро. Шар 90 г давим на чугуне при 250°, пока края не станут кружевными.',
+    stack: 0.8,
   },
   {
     layers: ['sauce'],
     title: 'Соус «Дым»',
     text: 'Копчёная паприка, маринованные огурцы и один ингредиент, который мы не расскажем.',
+    stack: 0.4,
   },
   {
     layers: ['bun-bottom'],
     title: 'Нижняя булка',
     text: 'Тоже поджариваем, чтобы сок не размочил дно до последнего укуса.',
+    stack: 1,
   },
 ];
 ---
@@ -39,7 +45,7 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
 
       <ol class="exploded mt-12 lg:mt-20" data-stage>
       {rows.map((row, i) => (
-        <li class:list={['row', i % 2 === 0 ? 'row-left' : 'row-right']}>
+        <li class:list={['row', i % 2 === 0 ? 'row-left' : 'row-right']} data-stack={row.stack} style={`z-index: ${rows.length - i}`}>
           <div class="layers">
             {row.layers.map((layer) => (
               <BurgerLayer layer={layer} class="layer" />
@@ -56,7 +62,7 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
   </div>
 
   <div class="mx-auto mt-12 flex max-w-7xl justify-center px-4 sm:px-6 lg:mt-16">
-    <button type="button" class="btn btn-primary" data-add-to-cart="classic" data-fly-from="[data-stage] .layers">Добавить «Классику дыма» за 18 ₾</button>
+    <button type="button" class="btn btn-primary" data-add-to-cart="classic" data-fly-from="[data-stage] .layers">Добавить «Классику дыма» за 18&nbsp;₾</button>
   </div>
 </section>
 
@@ -79,10 +85,23 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
     width: min(100%, 22rem);
   }
 
-  .layer {
+  .layers > :global(picture) {
+    display: block;
+  }
+  .layers :global(.layer) {
+    display: block;
     width: 100%;
     height: auto;
     filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.45));
+    user-select: none;
+  }
+  /* Две котлеты в одном ряду: верхняя лежит на нижней, сыр свисает поверх */
+  .layers > :global(picture + picture) {
+    margin-top: -8%;
+  }
+  .layers > :global(picture:first-child) {
+    position: relative;
+    z-index: 1;
   }
 
   .label {
@@ -256,6 +275,7 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
       layers: row.querySelector<HTMLElement>('.layers')!,
       label: row.querySelector<HTMLElement>('.label')!,
       h: 0,
+      stack: Number(row.dataset.stack),
       assembled: 0,
       exploded: 0,
     }));
@@ -281,20 +301,22 @@ const rows: Array<{ layers: Layer[]; title: string; text: string }> = [
       stage.style.setProperty('--w', '100px');
       const ratio = rows.reduce((sum, r) => sum + r.layers.offsetHeight, 0) / 100;
       const wMax = isDesktop ? Math.min(416, sw * 0.34) : Math.min(sw * 0.72, 272);
-      const w = Math.min(wMax, (avail * 0.72) / ratio);
+      // остаток высоты — на промежутки между слоями в разобранном виде
+      const w = Math.min(wMax, (avail * (isDesktop ? 0.72 : 0.84)) / ratio);
       stage.style.setProperty('--w', `${w}px`);
 
       rows.forEach((r) => (r.h = r.layers.offsetHeight));
       const total = rows.reduce((sum, r) => sum + r.h, 0);
-      const gap = clamp((avail - total) / (rows.length - 1), 8, isDesktop ? 48 : 36);
+      const gap = clamp((avail - total) / (rows.length - 1), 8, isDesktop ? 48 : 24);
       const spread = total + gap * (rows.length - 1);
 
-      let a = (avail - total * 0.88) / 2;
+      const assembledH = rows.reduce((sum, r, i) => sum + (i === rows.length - 1 ? r.h : r.h * r.stack), 0);
+      let a = (avail - assembledH) / 2;
       let x = Math.max(0, (avail - spread) / 2);
       rows.forEach((r) => {
         r.assembled = a;
         r.exploded = x;
-        a += r.h * 0.88; // в собранном виде слои заходят друг на друга
+        a += r.h * r.stack; // в собранном виде слои заходят друг на друга
         x += r.h + gap;
       });
       update();

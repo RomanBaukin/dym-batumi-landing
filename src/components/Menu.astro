@@ -1,5 +1,5 @@
 ---
-import FoodPlaceholder from './FoodPlaceholder.astro';
+import FoodPhoto from './FoodPhoto.astro';
 import { categories, menu, tagLabels } from '../data/menu';
 ---
 
@@ -32,7 +32,12 @@ import { categories, menu, tagLabels } from '../data/menu';
             .filter((item) => item.category === c.id)
             .map((item) => (
               <li class="card">
-                <FoodPlaceholder category={item.category} class="card-photo rounded-2xl sm:rounded-3xl" />
+                <FoodPhoto
+                  name={item.photo}
+                  widths={[208, 400, 640, 800]}
+                  sizes="(min-width: 80rem) 400px, (min-width: 64rem) 30vw, (min-width: 40rem) 45vw, 104px"
+                  class="card-photo rounded-2xl sm:rounded-3xl"
+                />
                 <div class="card-body flex flex-col">
                 <div class="flex items-start justify-between gap-4 sm:mt-5">
                   <h3 class="card-title display text-xl sm:text-2xl">{item.name}</h3>

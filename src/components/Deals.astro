@@ -1,5 +1,5 @@
 ---
-import FoodPlaceholder from './FoodPlaceholder.astro';
+import FoodPhoto from './FoodPhoto.astro';
 import { combo, comboFullPrice, menu } from '../data/menu';
 
 const comboItems = combo.items.map((id) => menu.find((m) => m.id === id)!);
@@ -12,10 +12,10 @@ const comboItems = combo.items.map((id) => menu.find((m) => m.id === id)!);
     <div class="grid gap-6 lg:grid-cols-3">
       <!-- Сет: главное предложение, занимает две трети -->
       <article class="combo relative overflow-hidden rounded-[2.5rem] bg-iron p-6 sm:p-10 lg:col-span-2">
-        <div class="grid items-center gap-8 sm:grid-cols-[minmax(0,15rem)_1fr]">
+        <div class="grid items-center gap-8 sm:grid-cols-[minmax(0,19rem)_1fr]">
           <div class="combo-visual" aria-hidden="true">
             {comboItems.map((item) => (
-              <FoodPlaceholder category={item.category} class="combo-piece rounded-full" />
+              <FoodPhoto name={item.photo} widths={[280]} sizes="140px" class="combo-piece rounded-full" />
             ))}
           </div>
 
@@ -51,7 +51,7 @@ const comboItems = combo.items.map((id) => menu.find((m) => m.id === id)!);
   /* Три позиции сета, заходящие друг на друга */
   .combo-visual {
     display: flex;
-    max-width: 15rem;
+    max-width: 19rem;
   }
   .combo-visual > :global(.combo-piece) {
     width: 45%;
@@ -63,10 +63,6 @@ const comboItems = combo.items.map((id) => menu.find((m) => m.id === id)!);
   }
   .combo-visual > :global(.combo-piece:nth-child(2)) {
     transform: translateY(-18%);
-  }
-  .combo-visual > :global(.combo-piece svg) {
-    width: 55%;
-    height: auto;
   }
 
   .tuesday-title {

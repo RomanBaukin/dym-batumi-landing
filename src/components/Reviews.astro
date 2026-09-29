@@ -1,26 +1,33 @@
 ---
-// Отзывы вымышленные — это демо-проект. Аватары-инициалы заменим на avatar-*.png на этапе 5.
+// Отзывы и люди вымышленные — это демо-проект, портреты сгенерированы.
+import { Image } from 'astro:assets';
+import { photo } from '../data/photos';
+
 const reviews = [
   {
     name: 'Артём',
+    avatar: 'avatar-2',
     place: 'переехал из Москвы',
     order: 'Классика дыма',
     text: 'Полгода искал в Батуми нормальный смэш. Нашёл. Края хрустят, булка не разваливается, привезли за 35 минут.',
   },
   {
     name: 'Нино',
+    avatar: 'avatar-1',
     place: 'Старый Батуми',
     order: 'Аджарский',
     text: 'Заказала в час ночи после смены. Желток потёк ровно так, как я надеялась. Теперь это мой способ пережить понедельник.',
   },
   {
     name: 'Гига',
+    avatar: 'avatar-3',
     place: 'Новый бульвар',
     order: 'Фри по-батумски',
     text: 'Фри по-батумски — преступление против диеты, и я соучастник. Беру каждую пятницу.',
   },
   {
     name: 'Ольга',
+    avatar: 'avatar-4',
     place: 'Махинджаури',
     order: 'Дымный сет',
     text: 'Живём за городом, думала — не довезут. Довезли горячим, курьер ещё и лишний соус положил.',
@@ -40,7 +47,7 @@ const [featured, ...rest] = reviews;
           <p>«{featured.text}»</p>
         </blockquote>
         <figcaption class="mt-8 flex items-center gap-4">
-          <span class="avatar avatar-lg" aria-hidden="true">{featured.name[0]}</span>
+          <Image src={photo(featured.avatar)} alt="" widths={[56, 112, 168]} sizes="56px" class="avatar avatar-lg" />
           <span>
             <span class="block font-semibold">{featured.name}, {featured.place}</span>
             <span class="block text-smoke">Заказ: «{featured.order}»</span>
@@ -56,7 +63,7 @@ const [featured, ...rest] = reviews;
                 <p>«{r.text}»</p>
               </blockquote>
               <figcaption class="mt-4 flex items-center gap-3">
-                <span class="avatar" aria-hidden="true">{r.name[0]}</span>
+                <Image src={photo(r.avatar)} alt="" widths={[44, 88, 132]} sizes="44px" class="avatar" />
                 <span class="text-sm">
                   <span class="block font-semibold">{r.name}, {r.place}</span>
                   <span class="block text-smoke">Заказ: «{r.order}»</span>
@@ -80,20 +87,15 @@ const [featured, ...rest] = reviews;
   }
 
   .avatar {
-    display: grid;
-    place-items: center;
     flex-shrink: 0;
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 999px;
+    object-fit: cover;
     background: var(--color-iron);
-    color: var(--color-cheddar);
-    font-family: var(--font-display);
-    font-weight: 800;
   }
   .avatar-lg {
     width: 3.5rem;
     height: 3.5rem;
-    font-size: 1.25rem;
   }
 </style>

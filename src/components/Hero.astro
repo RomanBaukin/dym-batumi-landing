@@ -1,5 +1,6 @@
 ---
-import BurgerPlaceholder from './BurgerPlaceholder.astro';
+import { Picture } from 'astro:assets';
+import { photo } from '../data/photos';
 
 const facts = [
   'Smash на чугуне 250°',
@@ -19,7 +20,17 @@ const facts = [
 
   <div class="mx-auto grid max-w-7xl items-start gap-6 px-4 pb-12 sm:px-6 lg:grid-cols-12 lg:gap-10 lg:pb-20">
     <div class="visual relative z-10 lg:order-2 lg:col-span-7">
-      <BurgerPlaceholder class="mx-auto w-full max-w-[290px] sm:max-w-[420px] lg:max-w-[640px]" />
+      <Picture
+        src={photo('hero-burger')}
+        alt="Двойной smash-бургер с чеддером и маринованным луком на чёрной доске, вокруг дым"
+        widths={[400, 640, 860, 1076]}
+        sizes="(min-width: 64rem) 640px, (min-width: 40rem) 480px, 340px"
+        formats={['avif', 'webp']}
+        loading="eager"
+        fetchpriority="high"
+        class="hero-photo"
+        pictureAttributes={{ class: 'mx-auto block w-full max-w-[340px] sm:max-w-[480px] lg:max-w-[640px]' }}
+      />
     </div>
 
     <div class="pt-2 lg:order-1 lg:col-span-5 lg:pt-16">
@@ -60,6 +71,11 @@ const facts = [
   */
   .smash-wrap {
     container-type: inline-size;
+    /* буквы поверх фото: тёмный фон кадра не должен их притенять */
+    position: relative;
+    z-index: 20;
+    /* анимация font-stretch перекладывает текст каждый кадр — пусть это не трогает остальную страницу */
+    contain: layout style;
   }
 
   .smash-word {
@@ -98,6 +114,13 @@ const facts = [
   .visual {
     margin-top: -5vw;
   }
+
+  /* Края кадра растворяются в фоне страницы: остаются бургер, доска и дым */
+  .hero-photo {
+    width: 100%;
+    height: auto;
+    mask-image: radial-gradient(ellipse 54% 54% at 52% 50%, #000 55%, transparent 100%);
+  }
   @media (min-width: 64rem) {
     .visual {
       margin-top: -6.5vw;
@@ -111,7 +134,7 @@ const facts = [
 
   .marquee {
     overflow: hidden;
-    font-family: var(--font-display);
+    font-family: "Science Gothic DYM", "Science Gothic Fallback Wide", sans-serif;
     font-stretch: 125%;
     font-weight: 800;
     font-size: 1.125rem;
