@@ -1,0 +1,586 @@
+---
+import { business, deliveryZones } from '../data/menu';
+---
+
+<dialog class="cart" data-cart aria-labelledby="cart-title">
+  <div class="flex h-full flex-col">
+    <header class="flex items-center gap-3 border-b border-brioche/10 px-5 py-4">
+      <button type="button" class="icon-btn" data-back hidden aria-label="Вернуться в корзину">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7" /></svg>
+      </button>
+      <h2 id="cart-title" class="cart-title display text-2xl" data-title>Корзина</h2>
+      <button type="button" class="icon-btn ml-auto" data-close aria-label="Закрыть">
+        <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </header>
+
+    <!-- Экран 1: корзина -->
+    <section class="flex min-h-0 flex-1 flex-col" data-view="cart">
+      <div class="flex flex-1 flex-col items-start justify-center gap-5 px-5" data-empty hidden>
+        <p class="display empty-title text-3xl">Здесь пока пусто</p>
+        <p class="text-smoke">Начните с «Классики дыма» — её заказывают чаще всего.</p>
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="btn btn-primary" data-add-to-cart="classic">Добавить «Классику дыма»</button>
+          <a href="#menu" class="btn btn-ghost" data-close>Открыть меню</a>
+        </div>
+      </div>
+
+      <ul class="flex-1 overflow-y-auto px-5" data-lines></ul>
+
+      <div class="border-t border-brioche/10 px-5 py-5" data-cart-footer>
+        <dl class="grid gap-2" data-summary></dl>
+        <p class="mt-3 text-sm text-cheddar" data-min-warning hidden></p>
+        <button type="button" class="btn btn-primary mt-4 w-full" data-to-checkout>Оформить заказ</button>
+      </div>
+    </section>
+
+    <!-- Экран 2: оформление -->
+    <form class="flex min-h-0 flex-1 flex-col" data-view="checkout" hidden novalidate>
+      <div class="flex-1 space-y-6 overflow-y-auto px-5 py-5">
+        <fieldset>
+          <legend class="field-label">Как получить заказ</legend>
+          <div class="segmented mt-2">
+            <label><input type="radio" name="mode" value="delivery" checked /><span>Доставка</span></label>
+            <label><input type="radio" name="mode" value="pickup" /><span>Самовывоз</span></label>
+          </div>
+          <p class="mt-2 text-sm text-smoke" data-pickup-note hidden>Заберёте по адресу {business.address}. Будет готово через 20 минут.</p>
+        </fieldset>
+
+        <div class="field">
+          <label for="f-name" class="field-label">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="given-name" required class="input" aria-describedby="e-name" />
+          <p id="e-name" class="field-error" hidden>Напишите, как к вам обращаться.</p>
+        </div>
+
+        <div class="field">
+          <label for="f-phone" class="field-label">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+995 5__ __ __ __" required class="input" aria-describedby="e-phone" data-phone />
+          <p id="e-phone" class="field-error" hidden>Нужен номер из 9 цифр после +995, например +995 555 12 34 56.</p>
+        </div>
+
+        <div class="space-y-6" data-delivery-only>
+          <div class="field">
+            <label for="f-zone" class="field-label">Район</label>
+            <select id="f-zone" name="zone" required class="input" aria-describedby="e-zone">
+              <option value="" selected disabled>Выберите район</option>
+              {deliveryZones.map((z) => (
+                <option value={z.id}>{z.name} — {z.time}</option>
+              ))}
+            </select>
+            <p id="e-zone" class="field-error" hidden>Выберите район — от него зависит время и стоимость доставки.</p>
+          </div>
+
+          <div class="field">
+            <label for="f-address" class="field-label">Адрес</label>
+            <input id="f-address" name="address" type="text" autocomplete="street-address" placeholder="Улица, дом, квартира" required class="input" aria-describedby="e-address" />
+            <p id="e-address" class="field-error" hidden>Укажите улицу и дом, чтобы курьер нашёл вас.</p>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend class="field-label">Когда</legend>
+          <div class="segmented mt-2">
+            <label><input type="radio" name="when" value="asap" checked /><span>Как можно скорее</span></label>
+            <label><input type="radio" name="when" value="time" /><span>Ко времени</span></label>
+          </div>
+          <div class="field mt-3" data-time-field hidden>
+            <label for="f-time" class="sr-only">Время</label>
+            <input id="f-time" name="time" type="time" step="900" class="input" aria-describedby="e-time" />
+            <p id="e-time" class="field-error" hidden>Укажите время с 11:00 до 01:30.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="field-label">Оплата</legend>
+          <div class="segmented mt-2">
+            <label><input type="radio" name="payment" value="cash" checked /><span>Наличными</span></label>
+            <label><input type="radio" name="payment" value="card" /><span data-card-label>Картой курьеру</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <label for="f-comment" class="field-label">Комментарий <span class="font-normal text-smoke">— необязательно</span></label>
+          <textarea id="f-comment" name="comment" rows="2" class="input" placeholder="Без лука, код домофона, подъезд"></textarea>
+        </div>
+
+        <div class="border-t border-brioche/10 pt-5">
+          <dl class="grid gap-2" data-checkout-summary></dl>
+          <p class="mt-3 text-sm text-cheddar" data-free-hint hidden></p>
+        </div>
+      </div>
+
+      <!-- Внизу только кнопка: сумма на ней, разбивка — в конце формы -->
+      <div class="border-t border-brioche/10 px-5 py-4">
+        <button type="submit" class="btn btn-primary w-full" data-submit>Подтвердить заказ</button>
+      </div>
+    </form>
+
+    <!-- Экран 3: заказ принят -->
+    <section class="flex flex-1 flex-col justify-center gap-5 px-5 py-8" data-view="done" hidden tabindex="-1">
+      <p class="done-title display text-cheddar" data-done-number></p>
+      <p class="text-xl font-semibold" data-done-eta></p>
+      <p class="text-smoke" data-done-note></p>
+      <p class="mt-4 rounded-2xl bg-iron p-4 text-sm text-smoke">
+        Это демо-проект: заказ никуда не отправлен, и бургер, увы, не приедет. Зато так может работать ваш сайт.
+      </p>
+      <button type="button" class="btn btn-primary self-start" data-close>Закрыть</button>
+    </section>
+  </div>
+</dialog>
+
+<div class="toast" role="status" aria-live="polite" data-toast></div>
+
+<style is:global>
+  html:has(dialog.cart[open]) {
+    overflow: hidden;
+  }
+
+  dialog.cart {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(100%, 28rem);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid color-mix(in oklab, var(--color-brioche) 10%, transparent);
+    background: var(--color-soot);
+    color: var(--color-brioche);
+  }
+  dialog.cart[open] {
+    animation: cart-in 0.28s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+  dialog.cart::backdrop {
+    background: rgb(10 6 4 / 0.7);
+    backdrop-filter: blur(3px);
+  }
+  @keyframes cart-in {
+    from {
+      transform: translateX(100%);
+    }
+  }
+
+  .cart-title {
+    font-stretch: 125%;
+  }
+  .empty-title {
+    font-stretch: 110%;
+  }
+  .done-title {
+    font-size: clamp(2.25rem, 9vw, 3rem);
+    font-stretch: 125%;
+    line-height: 0.95;
+  }
+
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    color: var(--color-brioche);
+  }
+  .icon-btn:hover {
+    background: var(--color-iron);
+  }
+
+  .field-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+  }
+  .input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.875rem;
+    border: 2px solid color-mix(in oklab, var(--color-brioche) 15%, transparent);
+    background: var(--color-iron);
+    color: var(--color-brioche);
+  }
+  .input::placeholder {
+    color: color-mix(in oklab, var(--color-smoke) 75%, transparent);
+  }
+  .input:focus-visible {
+    border-color: var(--color-cheddar);
+    outline: none;
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--color-ember);
+  }
+  select.input option {
+    background: var(--color-iron);
+  }
+  .field-error {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-ember);
+  }
+
+  /* Переключатели-«таблетки» на радиокнопках */
+  .segmented {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 999px;
+    background: var(--color-iron);
+  }
+  .segmented label {
+    flex: 1;
+    position: relative;
+  }
+  .segmented input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+  }
+  .segmented span {
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    padding-inline: 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-align: center;
+    color: var(--color-smoke);
+    cursor: pointer;
+  }
+  .segmented input:checked + span {
+    background: var(--color-brioche);
+    color: var(--color-soot);
+  }
+  .segmented input:focus-visible + span {
+    outline: 3px solid var(--color-cheddar);
+    outline-offset: 2px;
+  }
+
+  .qty {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    background: var(--color-iron);
+  }
+  .qty button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+  }
+  .qty button:hover {
+    background: color-mix(in oklab, var(--color-brioche) 10%, transparent);
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    z-index: 60;
+    translate: -50% 0;
+    width: max-content;
+    max-width: calc(100% - 2rem);
+  }
+  .toast:empty {
+    display: none;
+  }
+
+  .bump {
+    animation: bump 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+  @keyframes bump {
+    40% {
+      transform: scale(1.35);
+    }
+  }
+</style>
+
+<script>
+  import * as cart from '../scripts/cart-store';
+  import { business, deliveryZones } from '../data/menu';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-cart]')!;
+  const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = dialog) => root.querySelector<T>(sel)!;
+  const form = $<HTMLFormElement>('[data-view="checkout"]');
+  const views = ['cart', 'checkout', 'done'] as const;
+  type View = (typeof views)[number];
+  let view: View = 'cart';
+
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const { formatPrice } = cart;
+
+  /* ---------- открытие / экраны ---------- */
+
+  function show(next: View) {
+    view = next;
+    views.forEach((v) => ($(`[data-view="${v}"]`).hidden = v !== next));
+    $('[data-back]').hidden = next !== 'checkout';
+    $('[data-title]').textContent = { cart: 'Корзина', checkout: 'Оформление', done: 'Готово' }[next];
+    render();
+  }
+
+  function open() {
+    document.querySelector('[data-toast]')!.innerHTML = '';
+    show('cart');
+    dialog.showModal();
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-cart-button]')) open();
+    if (target.closest('[data-close]') && dialog.contains(target)) dialog.close();
+  });
+  // клик по затемнённому фону закрывает корзину
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    if (view === 'done') show('cart');
+  });
+  $('[data-back]').addEventListener('click', () => show('cart'));
+  $('[data-to-checkout]').addEventListener('click', () => {
+    show('checkout');
+    $<HTMLInputElement>('#f-name').focus();
+  });
+
+  /* ---------- добавление из меню ---------- */
+
+  const toast = document.querySelector<HTMLElement>('[data-toast]')!;
+  let toastTimer: number | undefined;
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-add-to-cart]');
+    if (!btn) return;
+    const id = btn.dataset.addToCart!;
+    cart.add(id);
+    if (dialog.open) return;
+    const name = cart.catalog.get(id)?.name ?? '';
+    toast.innerHTML = `
+      <div class="flex items-center gap-4 rounded-3xl bg-brioche py-2 pl-5 pr-2 text-soot shadow-2xl">
+        <span class="font-semibold">«${esc(name)}» в корзине</span>
+        <button type="button" class="rounded-full bg-soot px-4 py-2 text-sm font-semibold text-brioche" data-cart-button>Открыть</button>
+      </div>`;
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (toast.innerHTML = ''), 3500);
+  });
+
+  /* ---------- рендер ---------- */
+
+  const row = (label: string, value: string, strong = false) =>
+    `<div class="flex justify-between gap-4 ${strong ? 'text-lg font-semibold' : 'text-smoke'}"><dt>${label}</dt><dd>${value}</dd></div>`;
+
+  function currentMode(): cart.Mode {
+    return (form.elements.namedItem('mode') as RadioNodeList).value as cart.Mode;
+  }
+  function currentZone() {
+    return ((form.elements.namedItem('zone') as HTMLSelectElement).value || undefined) as cart.ZoneId | undefined;
+  }
+
+  function renderHeaderCount() {
+    const n = cart.count();
+    document.querySelectorAll<HTMLElement>('[data-cart-count]').forEach((el) => {
+      if (el.textContent !== String(n)) {
+        el.textContent = String(n);
+        el.classList.remove('bump');
+        void el.offsetWidth;
+        el.classList.add('bump');
+      }
+    });
+    document.querySelectorAll('[data-cart-button]').forEach((b) =>
+      b.setAttribute('aria-label', `Корзина, ${n} ${cart.plural(n, 'товар', 'товара', 'товаров')}`),
+    );
+  }
+
+  function renderCart() {
+    const lines = cart.lines();
+    const empty = lines.length === 0;
+    $('[data-empty]').hidden = !empty;
+    $('[data-lines]').hidden = empty;
+    $('[data-cart-footer]').hidden = empty;
+    if (empty) return;
+
+    $('[data-lines]').innerHTML = lines
+      .map(
+        (l) => `
+        <li class="flex items-center gap-4 border-b border-brioche/10 py-4">
+          <div class="min-w-0 flex-1">
+            <p class="font-semibold">${esc(l.name)}</p>
+            <p class="text-sm text-smoke">${formatPrice(l.price)}</p>
+          </div>
+          <div class="qty">
+            <button type="button" data-qty="${l.id}" data-delta="-1" aria-label="Убрать одну «${esc(l.name)}»">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 7h10"/></svg>
+            </button>
+            <span class="w-6 text-center font-semibold">${l.qty}<span class="sr-only"> шт.</span></span>
+            <button type="button" data-qty="${l.id}" data-delta="1" aria-label="Добавить ещё одну «${esc(l.name)}»">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 2v10M2 7h10"/></svg>
+            </button>
+          </div>
+          <p class="w-16 text-right font-semibold">${formatPrice(l.price * l.qty)}</p>
+        </li>`,
+      )
+      .join('');
+
+    const t = cart.totals();
+    $('[data-summary]').innerHTML = [
+      t.discount ? row('Сумма', formatPrice(t.subtotal)) : '',
+      t.discount ? row('Жирный вторник', `−${formatPrice(t.discount)}`) : '',
+      row('Итого', formatPrice(t.subtotal - t.discount), true),
+    ].join('');
+
+    const warn = $('[data-min-warning]');
+    warn.hidden = t.missing === 0;
+    warn.textContent = `Минимальный заказ — ${formatPrice(business.minOrder)}. Добавьте ещё на ${formatPrice(t.missing)}.`;
+    $<HTMLButtonElement>('[data-to-checkout]').disabled = t.missing > 0;
+  }
+
+  function renderCheckout() {
+    const mode = currentMode();
+    const zone = currentZone();
+    const t = cart.totals(mode, zone);
+    const delivery = mode === 'pickup' ? 'Самовывоз' : !zone ? 'Выберите район' : t.delivery === 0 ? 'Бесплатно' : formatPrice(t.delivery);
+
+    $('[data-checkout-summary]').innerHTML = [
+      row('Сумма', formatPrice(t.subtotal)),
+      t.discount ? row('Жирный вторник', `−${formatPrice(t.discount)}`) : '',
+      row('Доставка', delivery),
+      row('К оплате', formatPrice(t.total), true),
+    ].join('');
+
+    const hint = $('[data-free-hint]');
+    hint.hidden = !(mode === 'delivery' && zone && t.toFreeDelivery > 0);
+    hint.textContent = `Добавьте ещё на ${formatPrice(t.toFreeDelivery)} — доставка будет бесплатной.`;
+    $('[data-submit]').textContent = `Подтвердить заказ на ${formatPrice(t.total)}`;
+  }
+
+  function render() {
+    renderHeaderCount();
+    if (view === 'cart') renderCart();
+    if (view === 'checkout') {
+      // корзину опустошили в другой вкладке — возвращаемся
+      if (cart.count() === 0) return show('cart');
+      renderCheckout();
+    }
+  }
+
+  cart.subscribe(render);
+  renderHeaderCount();
+
+  $('[data-lines]').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-qty]');
+    if (!btn) return;
+    const id = btn.dataset.qty!;
+    const delta = btn.dataset.delta!;
+    const line = cart.lines().find((l) => l.id === id);
+    cart.setQty(id, (line?.qty ?? 0) + Number(delta));
+    // строки перерисовались — возвращаем фокус на ту же кнопку, а если позиция исчезла, на соседнюю
+    const same = dialog.querySelector<HTMLElement>(`[data-qty="${id}"][data-delta="${delta}"]`);
+    (same ?? dialog.querySelector<HTMLElement>('[data-qty]') ?? $<HTMLElement>('[data-empty] button')).focus();
+  });
+
+  /* ---------- форма ---------- */
+
+  const phone = $<HTMLInputElement>('[data-phone]');
+  const PREFIX = '+995 ';
+
+  function formatPhone(value: string) {
+    const digits = value.replace(/\D/g, '').replace(/^995/, '').slice(0, 9);
+    const parts = [digits.slice(0, 3), digits.slice(3, 5), digits.slice(5, 7), digits.slice(7, 9)].filter(Boolean);
+    return PREFIX + parts.join(' ');
+  }
+  phone.addEventListener('focus', () => {
+    if (!phone.value) phone.value = PREFIX;
+  });
+  phone.addEventListener('blur', () => {
+    if (phone.value.trim() === PREFIX.trim()) phone.value = '';
+  });
+  phone.addEventListener('input', () => {
+    phone.value = formatPhone(phone.value);
+  });
+
+  form.addEventListener('change', (e) => {
+    const name = (e.target as HTMLInputElement).name;
+    const mode = currentMode();
+    if (name === 'mode') {
+      $('[data-delivery-only]').hidden = mode === 'pickup';
+      $('[data-pickup-note]').hidden = mode !== 'pickup';
+      $('[data-card-label]').textContent = mode === 'pickup' ? 'Картой на кассе' : 'Картой курьеру';
+    }
+    if (name === 'when') {
+      $('[data-time-field]').hidden = (form.elements.namedItem('when') as RadioNodeList).value !== 'time';
+    }
+    renderCheckout();
+  });
+
+  /** Время ко времени: с 11:00 до 01:30 (ночь — после полуночи) */
+  function timeIsValid(v: string) {
+    if (!/^\d{2}:\d{2}$/.test(v)) return false;
+    const [h, m] = v.split(':').map(Number);
+    const mins = h * 60 + m;
+    return mins >= 11 * 60 || mins <= 90;
+  }
+
+  function validate() {
+    const mode = currentMode();
+    const when = (form.elements.namedItem('when') as RadioNodeList).value;
+    const checks: Array<[string, boolean]> = [
+      ['name', $<HTMLInputElement>('#f-name').value.trim().length > 0],
+      ['phone', phone.value.replace(/\D/g, '').replace(/^995/, '').length === 9],
+      ['zone', mode === 'pickup' || !!currentZone()],
+      ['address', mode === 'pickup' || $<HTMLInputElement>('#f-address').value.trim().length >= 3],
+      ['time', when !== 'time' || timeIsValid($<HTMLInputElement>('#f-time').value)],
+    ];
+    let firstInvalid: HTMLElement | null = null;
+    for (const [field, ok] of checks) {
+      const input = $<HTMLElement>(`#f-${field}`);
+      input.setAttribute('aria-invalid', String(!ok));
+      $(`#e-${field}`).hidden = ok;
+      if (!ok && !firstInvalid) firstInvalid = input;
+    }
+    firstInvalid?.focus();
+    return !firstInvalid;
+  }
+
+  // ошибка пропадает, как только поле исправили
+  form.addEventListener('input', (e) => {
+    const input = e.target as HTMLElement;
+    if (input.getAttribute('aria-invalid') === 'true') {
+      input.setAttribute('aria-invalid', 'false');
+      const err = document.getElementById(input.getAttribute('aria-describedby') ?? '');
+      if (err) err.hidden = true;
+    }
+  });
+
+  const clock = (d: Date) =>
+    new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit' }).format(d);
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const mode = currentMode();
+    const zone = deliveryZones.find((z) => z.id === currentZone());
+    const when = (form.elements.namedItem('when') as RadioNodeList).value;
+    const minutes = mode === 'pickup' ? 20 : parseInt(zone!.time, 10);
+    const at = when === 'time' ? $<HTMLInputElement>('#f-time').value : clock(new Date(Date.now() + minutes * 60_000));
+    const name = $<HTMLInputElement>('#f-name').value.trim();
+
+    $('[data-done-number]').textContent = `Заказ #${Math.floor(1000 + Math.random() * 9000)} принят`;
+    $('[data-done-eta]').textContent = mode === 'pickup' ? `Будет готов к ${at}` : `Привезём к ${at}`;
+    $('[data-done-note]').textContent =
+      mode === 'pickup'
+        ? `${name}, ждём вас по адресу ${business.address}.`
+        : `${name}, курьер позвонит за 5 минут до приезда.`;
+
+    cart.clear();
+    form.reset();
+    phone.value = '';
+    $('[data-delivery-only]').hidden = false;
+    $('[data-pickup-note]').hidden = true;
+    $('[data-time-field]').hidden = true;
+    show('done');
+    $('[data-view="done"]').focus();
+  });
+</script>
